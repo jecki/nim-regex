@@ -717,6 +717,21 @@ func startsWith*(
   debugCheckUtf8(s, pattern)
   startsWithImpl2(s, pattern.toRegex, start)
 
+func startsWith*(
+  s: string,
+  pattern: Regex2,
+  m: var RegexMatch2,
+  start = 0
+): bool {.inline, raises: [].} =
+  ## return whether the string
+  ## starts with the pattern or not
+  runnableExamples:
+    doAssert "abc".startsWith(re2"\w", m, 1)
+    doAssert m.bounds == 1 .. 1
+
+  debugCheckUtf8(s, pattern)
+  startsWithImpl2(s, pattern.toRegex, m, start)
+
 func endsWith*(s: string, pattern: Regex2): bool {.inline, raises: [].} =
   ## return whether the string
   ## ends with the pattern or not

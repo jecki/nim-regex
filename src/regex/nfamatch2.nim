@@ -293,3 +293,33 @@ func startsWithImpl2*(
   result = matchImpl(
     smA, smB, capts, captIdx, text, regex.nfa, look, start, flags
   )
+
+
+func startsWithImpl2*(
+  text: string,
+  regex: Regex,
+  m: var RegexMatch2,
+  start: int
+): bool =
+  # XXX optimize mfShortestMatch, mfNoCaptures
+  let flags = regex.flags.toMatchFlags + {mfAnchored, mfShortestMatch}
+  var
+    smA = newSubmatches(regex.nfa.s.len)
+    smB = newSubmatches(regex.nfa.s.len)
+    capts = initCapts3(regex.groupsCount)
+    captIdx = -1'i32
+    look = initLook()
+  result = matchImpl(
+    smA, smB, capts, captIdx, text, regex.nfa, look, start, flags
+  )
+  if result:
+    m.captures.setLen regex.groupsCount
+    if captIdx != -1:
+      for i in 0 .. m.captures.len-1:
+        m.captures[i] = capts[captIdx, i]
+    else:
+      for i in 0 .. m.captures.len-1:
+        m.captures[i] = nonCapture
+    if regex.namedGroups.len > 0:
+      m.namedGroups = regex.namedGroups
+    m.boundaries = smA[0].bounds
